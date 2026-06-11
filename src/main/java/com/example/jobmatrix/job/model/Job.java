@@ -27,4 +27,6 @@ public class Job {
     private String location;
     private Double salary;
     private Integer experienceRequired;
+    @Indexed
+    private String jobType;
 }
