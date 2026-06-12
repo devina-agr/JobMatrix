@@ -1,12 +1,17 @@
 package com.example.jobmatrix.user.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "user")
+@Entity
+@Table(
+          name = "users",
+          indexes = {
+                  @Index(name = "idx_user_email",columnList = "email")
+          }
+       )
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,12 +20,25 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false, unique = true)
     private String username;
+    @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Role role;
     private boolean enabled;
+    @Column(nullable = false,updatable = false)
     private LocalDateTime createdAt;
     private int tokenVersion;
+
+    @PrePersist
+    public void prePersist(){
+        this.createdAt=LocalDateTime.now();
+    }
+
 }

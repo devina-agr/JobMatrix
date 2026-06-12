@@ -1,31 +1,56 @@
 package com.example.jobmatrix.user.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.index.TextIndexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.Set;
 
-import java.util.List;
 
-@Document(collection = "candidate_profiles")
+@Entity
+@Table(
+         name = "candidate_profiles",
+         indexes = {
+                 @Index(name = "idx_candidate_location", columnList = "location"),
+                 @Index(name = "idx_candidate_experience",columnList = "experience")
+         }
+
+      )
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CandidateProfile {
+public class CandidateProfile{
 
     @Id
-    private String id;
-    private String userId;
-    @Indexed
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true,nullable = false)
+    private User user;
+    @NotBlank
+    @Column(nullable = false)
     private String location;
+    @NotNull
+    @Column(nullable = false)
     private Integer experience;
-    @TextIndexed
-    private List<String> skills;
+    @ElementCollection
+    @CollectionTable(name = "candidate_skills",
+            joinColumns = @JoinColumn(name = "candidate_profile_id"),
+            indexes = {
+                 @Index(
+                         name = "idx_candidate_skill",
+                         columnList = "skill"
+                 )
+            }
+    )
+    @Column(name = "skill",nullable = false)
+    private Set<String> skills;
+    @Column(nullable = false)
+    @NotBlank
     private String resumeUrl;
-    @TextIndexed
+    @Column(length = 2000)
     private String bio;
     private String githubUrl;
     private String linkedinUrl;

@@ -1,12 +1,28 @@
 package com.example.jobmatrix.user.model;
 
+import com.example.jobmatrix.company.model.Company;
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.index.TextIndexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "recruiter_profiles")
+
+@Entity
+@Table(
+          name = "recruiter_profiles",
+          indexes = {
+                  @Index(
+                          name = "idx_recruiter_company_name",
+                          columnList = "companyName"
+                  ),
+                  @Index(
+                          name = "idx_recruiter_industry",
+                          columnList = "industry"
+                  ),
+                  @Index(
+                          name = "idx_recruiter_verified",
+                          columnList = "verified"
+                  )
+          }
+      )
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,16 +31,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class RecruiterProfile {
 
     @Id
-    private String id;
-    @Indexed
-    private String userId;
-    @Indexed
-    private String companyName;
-    private String companyWebsiteUrl;
-    private String companyLogoUrl;
-    private String companyDescription;
-    @Indexed
-    private String industry;
-    @Indexed
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id",unique = true)
+    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Department department;
+    @Column(nullable = false)
     private boolean verified;
 }
