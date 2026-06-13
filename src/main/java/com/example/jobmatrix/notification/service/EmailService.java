@@ -105,4 +105,44 @@ public class EmailService {
             );
         }
     }
+
+    public void sendEmail(
+            String email,
+            String subject,
+            String htmlContent
+    ) {
+
+        try {
+
+            MimeMessage mimeMessage =
+                    mailSender.createMimeMessage();
+
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(
+                            mimeMessage,
+                            true,
+                            "UTF-8"
+                    );
+
+            helper.setTo(email);
+
+            helper.setSubject(subject);
+
+            helper.setText(
+                    htmlContent,
+                    true
+            );
+
+            mailSender.send(
+                    mimeMessage
+            );
+
+        } catch (MessagingException e) {
+
+            throw new RuntimeException(
+                    "Failed to send email",
+                    e
+            );
+        }
+    }
 }

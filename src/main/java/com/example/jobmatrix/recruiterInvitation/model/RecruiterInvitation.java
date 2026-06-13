@@ -3,10 +3,7 @@ package com.example.jobmatrix.recruiterInvitation.model;
 import com.example.jobmatrix.company.model.Company;
 import com.example.jobmatrix.user.model.User;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class RecruiterInvitation {
 
     @Id
