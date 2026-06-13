@@ -1,14 +1,27 @@
 package com.example.jobmatrix.dto.response;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+import java.util.Set;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class JobResponse {
-    private String id;
+
+    private Long id;
+
     private String title;
+
     private String companyName;
+
     private String location;
+
     private Double salary;
+
+    private Integer experienceRequired;
+
+    private Set<String> skills;
 }

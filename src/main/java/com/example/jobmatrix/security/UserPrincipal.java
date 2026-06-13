@@ -1,7 +1,6 @@
 package com.example.jobmatrix.security;
 
 import com.example.jobmatrix.user.model.User;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal
+        implements UserDetails {
 
     private final User user;
 
@@ -18,22 +18,24 @@ public class UserPrincipal implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority>
+    getAuthorities() {
+
         return List.of(
                 new SimpleGrantedAuthority(
-                        user.getRole().toString()
+                        user.getRole().name()
                 )
         );
     }
 
     @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
         return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
 
     @Override
@@ -56,7 +58,19 @@ public class UserPrincipal implements UserDetails {
         return user.isEnabled();
     }
 
-    public int getTokenVersion() {
+    public Long getId() {
+        return user.getId();
+    }
+
+    public Integer getTokenVersion() {
         return user.getTokenVersion();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getActualUsername() {
+        return user.getUsername();
     }
 }

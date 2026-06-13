@@ -2,11 +2,17 @@ package com.example.jobmatrix.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LoginRequest {
+
     @Email
+    @NotBlank
     private String email;
 
     @NotBlank

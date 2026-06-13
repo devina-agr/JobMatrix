@@ -1,9 +1,11 @@
 package com.example.jobmatrix.user.model;
 
+import com.example.jobmatrix.auth.model.RefreshToken;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(
@@ -35,7 +37,12 @@ public class User {
     @Column(nullable = false,updatable = false)
     private LocalDateTime createdAt;
     private int tokenVersion;
-
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<RefreshToken> refreshTokens;
     @PrePersist
     public void prePersist(){
         this.createdAt=LocalDateTime.now();

@@ -8,20 +8,16 @@ import lombok.*;
 @Entity
 @Table(
           name = "recruiter_profiles",
-          indexes = {
-                  @Index(
-                          name = "idx_recruiter_company_name",
-                          columnList = "companyName"
-                  ),
-                  @Index(
-                          name = "idx_recruiter_industry",
-                          columnList = "industry"
-                  ),
-                  @Index(
-                          name = "idx_recruiter_verified",
-                          columnList = "verified"
-                  )
-          }
+        indexes = {
+                @Index(
+                        name = "idx_recruiter_department",
+                        columnList = "department"
+                ),
+                @Index(
+                        name = "idx_recruiter_verified",
+                        columnList = "verified"
+                )
+        }
       )
 @Getter
 @Setter
