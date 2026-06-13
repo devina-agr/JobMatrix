@@ -1,9 +1,9 @@
 package com.example.jobmatrix.exception;
 
-public class JobAlreadyAppliedException
+public class BadRequestException
         extends RuntimeException {
 
-    public JobAlreadyAppliedException(
+    public BadRequestException(
             String message
     ) {
         super(message);

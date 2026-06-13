@@ -1,9 +1,9 @@
 package com.example.jobmatrix.exception;
 
-public class JobAlreadyAppliedException
+public class EmailAlreadyExistsException
         extends RuntimeException {
 
-    public JobAlreadyAppliedException(
+    public EmailAlreadyExistsException(
             String message
     ) {
         super(message);

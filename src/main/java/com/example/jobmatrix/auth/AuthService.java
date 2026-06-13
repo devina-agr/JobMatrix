@@ -6,6 +6,10 @@ import com.example.jobmatrix.dto.TokenPayload;
 import com.example.jobmatrix.dto.request.LoginRequest;
 import com.example.jobmatrix.dto.request.RegisterRequest;
 import com.example.jobmatrix.dto.response.AuthResponse;
+import com.example.jobmatrix.exception.EmailAlreadyExistsException;
+import com.example.jobmatrix.exception.InvalidTokenException;
+import com.example.jobmatrix.exception.RefreshTokenExpiredException;
+import com.example.jobmatrix.exception.ResourceNotFoundException;
 import com.example.jobmatrix.security.JwtService;
 import com.example.jobmatrix.user.model.Role;
 import com.example.jobmatrix.user.model.User;
@@ -39,7 +43,7 @@ public class AuthService {
                 request.getEmail()
         )) {
 
-            throw new RuntimeException(
+            throw new EmailAlreadyExistsException(
                     "Email already exists"
             );
         }
@@ -86,9 +90,10 @@ public class AuthService {
                                 request.getEmail()
                         )
                         .orElseThrow(
-                                () -> new RuntimeException(
-                                        "User not found"
+                                () -> new ResourceNotFoundException(
+                                            "User not found"
                                 )
+
                         );
 
         return generateTokens(user);
@@ -102,14 +107,14 @@ public class AuthService {
                 refreshTokenRepository
                         .findByToken(refreshToken)
                         .orElseThrow(
-                                () -> new RuntimeException(
+                                () -> new InvalidTokenException(
                                         "Invalid refresh token"
                                 )
                         );
 
         if (!token.isValid()) {
 
-            throw new RuntimeException(
+            throw new RefreshTokenExpiredException(
                     "Refresh token expired"
             );
         }

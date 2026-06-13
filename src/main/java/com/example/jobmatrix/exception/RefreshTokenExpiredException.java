@@ -1,9 +1,9 @@
 package com.example.jobmatrix.exception;
 
-public class JobAlreadyAppliedException
+public class RefreshTokenExpiredException
         extends RuntimeException {
 
-    public JobAlreadyAppliedException(
+    public RefreshTokenExpiredException(
             String message
     ) {
         super(message);

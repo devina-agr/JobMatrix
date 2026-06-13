@@ -1,9 +1,9 @@
 package com.example.jobmatrix.exception;
 
-public class JobAlreadyAppliedException
+public class InvalidTokenException
         extends RuntimeException {
 
-    public JobAlreadyAppliedException(
+    public InvalidTokenException(
             String message
     ) {
         super(message);
