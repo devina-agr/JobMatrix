@@ -1,4 +1,4 @@
-package com.example.jobmatrix.config;
+package com.example.jobmatrix.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

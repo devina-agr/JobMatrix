@@ -1,8 +1,9 @@
-package com.example.jobmatrix.auth;
+package com.example.jobmatrix.auth.controller;
 
-import com.example.jobmatrix.dto.request.LoginRequest;
+import com.example.jobmatrix.auth.dto.LoginRequest;
+import com.example.jobmatrix.auth.service.AuthService;
 import com.example.jobmatrix.dto.request.RefreshTokenRequest;
-import com.example.jobmatrix.dto.request.RegisterRequest;
+import com.example.jobmatrix.auth.dto.RegisterRequest;
 import com.example.jobmatrix.dto.response.AuthResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

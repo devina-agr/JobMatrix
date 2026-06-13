@@ -7,13 +7,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompanyMapper {
 
-    public CompanyResponse toResponse(Company company) {
+    public CompanyResponse toResponse(
+            Company company
+    ) {
 
         return CompanyResponse.builder()
                 .id(company.getId())
                 .name(company.getName())
                 .industry(company.getIndustry())
                 .websiteUrl(company.getWebsiteUrl())
+                .logoUrl(company.getLogoUrl())
+                .description(company.getDescription())
+                .headquarters(company.getHeadquarters())
+                .employeeCount(company.getEmployeeCount())
                 .verified(company.isVerified())
                 .build();
     }

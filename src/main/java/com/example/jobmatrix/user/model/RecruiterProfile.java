@@ -39,5 +39,9 @@ public class RecruiterProfile {
     @Column(nullable = false)
     private Department department;
     @Column(nullable = false)
-    private boolean verified;
+    private Boolean verified;
+
+    public boolean isVerified() {
+        return false;
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.jobmatrix.dto.request;
+package com.example.jobmatrix.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

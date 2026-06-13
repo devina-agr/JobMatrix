@@ -1,4 +1,4 @@
-package com.example.jobmatrix.dto.request;
+package com.example.jobmatrix.auth.dto;
 
 import com.example.jobmatrix.user.model.Role;
 import jakarta.validation.constraints.Email;
@@ -22,7 +22,4 @@ public class RegisterRequest {
 
     @NotBlank
     private String password;
-
-    @NotNull
-    private Role role;
 }

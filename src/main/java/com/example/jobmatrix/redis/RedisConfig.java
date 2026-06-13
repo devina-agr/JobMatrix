@@ -1,4 +1,4 @@
-package com.example.jobmatrix.config;
+package com.example.jobmatrix.redis;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

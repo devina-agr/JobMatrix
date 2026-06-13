@@ -17,8 +17,7 @@ public class ApplicationMapper {
                         application.getCandidate().getId()
                 )
                 .candidateName(
-                        application.getCandidate()
-                                .getUsername()
+                        application.getCandidate().getUsername()
                 )
                 .jobId(
                         application.getJob().getId()
@@ -38,7 +37,7 @@ public class ApplicationMapper {
                         application.getCoverLetter()
                 )
                 .status(
-                        application.getStatus().name()
+                        application.getStatus()
                 )
                 .appliedAt(
                         application.getAppliedAt()

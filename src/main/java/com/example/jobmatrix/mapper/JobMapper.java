@@ -7,18 +7,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobMapper {
 
-    public JobResponse toResponse(Job job) {
+    public JobResponse toResponse(
+            Job job
+    ) {
 
         return JobResponse.builder()
                 .id(job.getId())
                 .title(job.getTitle())
-                .companyName(job.getCompany().getName())
+                .companyName(
+                        job.getCompany().getName()
+                )
                 .location(job.getLocation())
                 .salary(job.getSalary())
                 .experienceRequired(
                         job.getExperienceRequired()
                 )
+                .jobType(job.getJobType())
                 .skills(job.getSkills())
+                .active(job.isActive())
+                .createdAt(job.getCreatedAt())
                 .build();
     }
 }

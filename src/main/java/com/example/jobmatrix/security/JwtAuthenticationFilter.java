@@ -32,6 +32,17 @@ public class JwtAuthenticationFilter
 
         String path = request.getServletPath();
 
+        if (
+                path.startsWith("/api/auth")
+                        || path.startsWith("/swagger-ui")
+                        || path.startsWith("/v3/api-docs")
+                        || path.startsWith("/swagger-resources")
+                        || path.startsWith("/webjars")
+        ) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (path.startsWith("/api/auth")) {
 
             filterChain.doFilter(

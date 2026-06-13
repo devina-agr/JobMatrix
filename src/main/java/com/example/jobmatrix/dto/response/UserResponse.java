@@ -2,6 +2,8 @@ package com.example.jobmatrix.dto.response;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,4 +18,8 @@ public class UserResponse {
     private String email;
 
     private String role;
+
+    private Boolean enabled;
+
+    private LocalDateTime createdAt;
 }

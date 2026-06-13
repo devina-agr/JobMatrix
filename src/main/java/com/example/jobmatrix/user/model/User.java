@@ -33,7 +33,7 @@ public class User {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
-    private boolean enabled;
+    private Boolean enabled;
     @Column(nullable = false,updatable = false)
     private LocalDateTime createdAt;
     private int tokenVersion;
@@ -48,4 +48,7 @@ public class User {
         this.createdAt=LocalDateTime.now();
     }
 
+    public Boolean isEnabled() {
+        return false;
+    }
 }

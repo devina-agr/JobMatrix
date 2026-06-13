@@ -1,10 +1,10 @@
-package com.example.jobmatrix.auth;
+package com.example.jobmatrix.auth.service;
 
 import com.example.jobmatrix.auth.model.RefreshToken;
 import com.example.jobmatrix.auth.repository.RefreshTokenRepository;
 import com.example.jobmatrix.dto.TokenPayload;
-import com.example.jobmatrix.dto.request.LoginRequest;
-import com.example.jobmatrix.dto.request.RegisterRequest;
+import com.example.jobmatrix.auth.dto.LoginRequest;
+import com.example.jobmatrix.auth.dto.RegisterRequest;
 import com.example.jobmatrix.dto.response.AuthResponse;
 import com.example.jobmatrix.exception.EmailAlreadyExistsException;
 import com.example.jobmatrix.exception.InvalidTokenException;
@@ -61,9 +61,7 @@ public class AuthService {
                         )
                 )
                 .role(
-                        request.getRole() == null
-                                ? Role.ROLE_CANDIDATE
-                                : request.getRole()
+                       Role.ROLE_CANDIDATE
                 )
                 .enabled(true)
                 .tokenVersion(0)

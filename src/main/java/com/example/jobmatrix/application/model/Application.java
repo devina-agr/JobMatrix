@@ -70,6 +70,8 @@ public class Application {
 
     @PrePersist
     public void prePersist() {
+
         this.appliedAt = LocalDateTime.now();
+        this.status=ApplicationStatus.APPLIED;
     }
 }

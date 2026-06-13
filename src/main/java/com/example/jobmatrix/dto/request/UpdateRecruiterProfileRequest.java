@@ -1,5 +1,6 @@
 package com.example.jobmatrix.dto.request;
 
+import com.example.jobmatrix.user.model.Department;
 import lombok.*;
 
 @Getter
@@ -11,5 +12,5 @@ public class UpdateRecruiterProfileRequest {
 
     private Long companyId;
 
-    private String department;
+    private Department department;
 }

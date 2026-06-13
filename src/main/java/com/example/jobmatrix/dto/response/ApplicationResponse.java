@@ -1,5 +1,6 @@
 package com.example.jobmatrix.dto.response;
 
+import com.example.jobmatrix.application.model.ApplicationStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class ApplicationResponse {
 
     private String coverLetter;
 
-    private String status;
+    private ApplicationStatus status;
 
     private LocalDateTime appliedAt;
 }

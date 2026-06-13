@@ -17,5 +17,13 @@ public class CompanyResponse {
 
     private String websiteUrl;
 
+    private String logoUrl;
+
+    private String description;
+
+    private String headquarters;
+
+    private Integer employeeCount;
+
     private boolean verified;
 }
