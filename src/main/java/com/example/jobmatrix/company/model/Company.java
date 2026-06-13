@@ -61,10 +61,10 @@ public class Company {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "owner_id",
+            name = "manager_id",
             nullable = false
     )
-    private User owner;
+    private User manager;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

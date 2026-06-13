@@ -72,6 +72,11 @@ public class SecurityConfig {
                                 "/api/candidate/**"
                         ).hasRole("CANDIDATE")
 
+                        .requestMatchers(
+                                "/api/company-manager/**"
+                        )
+
+                        .hasRole("COMPANY_MANAGER")
                         .anyRequest()
                         .authenticated()
                 )

@@ -56,7 +56,7 @@ public class CompanyService {
                                 request.getEmployeeCount()
                         )
                         .verified(false)
-                        .owner(owner)
+                        .manager(owner)
                         .build();
 
         companyRepository.save(company);

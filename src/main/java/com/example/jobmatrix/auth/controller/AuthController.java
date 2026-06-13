@@ -4,6 +4,7 @@ import com.example.jobmatrix.auth.dto.LoginRequest;
 import com.example.jobmatrix.auth.service.AuthService;
 import com.example.jobmatrix.dto.request.RefreshTokenRequest;
 import com.example.jobmatrix.auth.dto.RegisterRequest;
+import com.example.jobmatrix.dto.request.RegisterCompanyManagerRequest;
 import com.example.jobmatrix.dto.response.AuthResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +63,13 @@ public class AuthController {
 
         return ResponseEntity.noContent()
                 .build();
+    }
+
+    @PostMapping("/register/company-manager")
+    public ResponseEntity<AuthResponse> registerRecruiter(
+            @Valid @RequestBody RegisterCompanyManagerRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(authService.registerCompanyManagerRecruiter(request));
     }
 }
