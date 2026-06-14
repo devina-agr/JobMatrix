@@ -46,7 +46,11 @@ public class JobService {
                                         "Company not found"
                                 )
                         );
-
+        if (!company.isVerified()) {
+            throw new IllegalStateException(
+                    "Company must be verified before posting jobs"
+            );
+        }
         Job job = new Job();
 
         job.setRecruiter(recruiter);

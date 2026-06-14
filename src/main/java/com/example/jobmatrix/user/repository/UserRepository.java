@@ -1,5 +1,6 @@
 package com.example.jobmatrix.user.repository;
 
+import com.example.jobmatrix.user.model.Role;
 import com.example.jobmatrix.user.model.User;
 import jakarta.validation.constraints.Email;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     List<User> findAllByOrderByCreatedAtDesc();
+
+    boolean existsByRole(Role role);
 }

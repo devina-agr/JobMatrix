@@ -1,5 +1,6 @@
 package com.example.jobmatrix.dto.request;
 
+import com.example.jobmatrix.company.model.Industry;
 import com.example.jobmatrix.user.model.Department;
 import lombok.*;
 
@@ -19,5 +20,7 @@ public class RegisterCompanyManagerRequest {
     private String companyName;
 
     private String companyWebsite;
+
+    private Industry industry;
 
 }

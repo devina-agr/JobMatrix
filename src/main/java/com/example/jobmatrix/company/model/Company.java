@@ -41,13 +41,14 @@ public class Company {
     )
     private String name;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String industry;
+    @Enumerated(EnumType.STRING)
+    private Industry industry;
 
     private String websiteUrl;
 
     private String logoUrl;
+
+    private String logoPublicId;
 
     @Column(length = 3000)
     private String description;

@@ -2,6 +2,7 @@ package com.example.jobmatrix.upload;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.example.jobmatrix.dto.response.CloudinaryUploadResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,14 +35,97 @@ public class CloudinaryService {
                 .toString();
     }
 
+    public CloudinaryUploadResponse uploadResume(
+            MultipartFile file
+    ) {
+
+        try {
+
+            Map<?, ?> result =
+                    cloudinary.uploader().upload(
+                            file.getBytes(),
+                            ObjectUtils.asMap(
+                                    "resource_type",
+                                    "raw",
+                                    "folder",
+                                    "jobmatrix/resumes"
+                            )
+                    );
+
+            return CloudinaryUploadResponse.builder()
+                    .url(
+                            result.get("secure_url")
+                                    .toString()
+                    )
+                    .publicId(
+                            result.get("public_id")
+                                    .toString()
+                    )
+                    .build();
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Failed to upload resume",
+                    e
+            );
+        }
+    }
+
+    public CloudinaryUploadResponse uploadCompanyLogo(
+            MultipartFile file
+    ) {
+
+        try {
+
+            Map<?, ?> result =
+                    cloudinary.uploader().upload(
+                            file.getBytes(),
+                            ObjectUtils.asMap(
+                                    "resource_type",
+                                    "image",
+                                    "folder",
+                                    "jobmatrix/company-logos"
+                            )
+                    );
+
+            return CloudinaryUploadResponse.builder()
+                    .url(
+                            result.get("secure_url")
+                                    .toString()
+                    )
+                    .publicId(
+                            result.get("public_id")
+                                    .toString()
+                    )
+                    .build();
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Failed to upload company logo",
+                    e
+            );
+        }
+    }
+
     public void deleteFile(
             String publicId
-    ) throws IOException {
+    ) {
 
-        cloudinary.uploader()
-                .destroy(
-                        publicId,
-                        ObjectUtils.emptyMap()
-                );
+        try {
+
+            cloudinary.uploader().destroy(
+                    publicId,
+                    ObjectUtils.emptyMap()
+            );
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Failed to delete file",
+                    e
+            );
+        }
     }
 }

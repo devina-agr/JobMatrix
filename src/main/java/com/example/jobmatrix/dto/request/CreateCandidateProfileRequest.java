@@ -17,8 +17,6 @@ public class CreateCandidateProfileRequest {
 
     private Set<String> skills;
 
-    private String resumeUrl;
-
     private String bio;
 
     private String githubUrl;

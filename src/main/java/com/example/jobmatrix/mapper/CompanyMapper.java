@@ -14,7 +14,7 @@ public class CompanyMapper {
         return CompanyResponse.builder()
                 .id(company.getId())
                 .name(company.getName())
-                .industry(company.getIndustry())
+                .industry(company.getIndustry().name())
                 .websiteUrl(company.getWebsiteUrl())
                 .logoUrl(company.getLogoUrl())
                 .description(company.getDescription())

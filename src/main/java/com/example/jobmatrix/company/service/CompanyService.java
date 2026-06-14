@@ -4,14 +4,18 @@ import com.example.jobmatrix.company.model.Company;
 import com.example.jobmatrix.company.repository.CompanyRepository;
 import com.example.jobmatrix.dto.request.CreateCompanyRequest;
 import com.example.jobmatrix.dto.request.UpdateCompanyRequest;
+import com.example.jobmatrix.dto.response.CloudinaryUploadResponse;
 import com.example.jobmatrix.dto.response.CompanyResponse;
 import com.example.jobmatrix.exception.ResourceNotFoundException;
 import com.example.jobmatrix.mapper.CompanyMapper;
+import com.example.jobmatrix.upload.CloudinaryService;
 import com.example.jobmatrix.user.model.User;
 import com.example.jobmatrix.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class CompanyService {
     private final UserRepository userRepository;
 
     private final CompanyMapper companyMapper;
+
+    private final CloudinaryService cloudinaryService;
 
     public CompanyResponse createCompany(
             CreateCompanyRequest request,
@@ -43,9 +49,6 @@ public class CompanyService {
                         .websiteUrl(
                                 request.getWebsiteUrl()
                         )
-                        .logoUrl(
-                                request.getLogoUrl()
-                        )
                         .description(
                                 request.getDescription()
                         )
@@ -55,6 +58,8 @@ public class CompanyService {
                         .employeeCount(
                                 request.getEmployeeCount()
                         )
+                        .logoUrl(null)
+                        .logoPublicId(null)
                         .verified(false)
                         .manager(owner)
                         .build();
@@ -134,11 +139,6 @@ public class CompanyService {
                     request.getWebsiteUrl()
             );
 
-        if(request.getLogoUrl()!=null)
-            company.setLogoUrl(
-                    request.getLogoUrl()
-            );
-
         if(request.getDescription()!=null)
             company.setDescription(
                     request.getDescription()
@@ -178,5 +178,90 @@ public class CompanyService {
         companyRepository.delete(
                 company
         );
+    }
+
+    public String uploadLogo(
+            Long companyId,
+            MultipartFile file
+    ) {
+
+        Company company =
+                companyRepository.findById(
+                                companyId
+                        )
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Company not found"
+                                )
+                        );
+
+        if(company.getLogoPublicId() != null){
+
+            cloudinaryService.deleteFile(
+                    company.getLogoPublicId()
+            );
+        }
+
+        CloudinaryUploadResponse upload =
+                cloudinaryService.uploadCompanyLogo(
+                        file
+                );
+
+        company.setLogoUrl(
+                upload.getUrl()
+        );
+
+        company.setLogoPublicId(
+                upload.getPublicId()
+        );
+
+        companyRepository.save(
+                company
+        );
+
+        return upload.getUrl();
+    }
+
+    public void deleteLogo(
+            Long companyId
+    ) {
+
+        Company company =
+                companyRepository.findById(
+                                companyId
+                        )
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Company not found"
+                                )
+                        );
+
+        if(company.getLogoPublicId() != null){
+
+            cloudinaryService.deleteFile(
+                    company.getLogoPublicId()
+            );
+
+            company.setLogoUrl(null);
+
+            company.setLogoPublicId(null);
+
+            companyRepository.save(
+                    company
+            );
+        }
+    }
+
+    public void verifyCompany(Long companyId) {
+
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Company not found with id: " + companyId
+                        ));
+
+        company.setVerified(true);
+
+        companyRepository.save(company);
     }
 }

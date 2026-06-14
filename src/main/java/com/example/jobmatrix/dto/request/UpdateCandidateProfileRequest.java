@@ -21,9 +21,6 @@ public class UpdateCandidateProfileRequest {
 
     private Set<String> skills;
 
-    @NotBlank
-    private String resumeUrl;
-
     private String bio;
 
     private String githubUrl;

@@ -7,9 +7,12 @@ import com.example.jobmatrix.security.UserPrincipal;
 import com.example.jobmatrix.user.service.CandidateProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/candidate/profile")
@@ -60,5 +63,36 @@ public class CandidateProfileController {
                         request
                 )
         );
+    }
+
+    @PostMapping(
+            value = "/resume",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<String> uploadResume(
+            @RequestParam("file")
+            MultipartFile file,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok(
+                candidateProfileService.uploadResume(
+                        authentication,
+                        file
+                )
+        );
+    }
+
+    @DeleteMapping("/resume")
+    public ResponseEntity<Void> deleteResume(
+            Authentication authentication
+    ) {
+
+        candidateProfileService.deleteResume(
+                authentication
+        );
+
+        return ResponseEntity.noContent()
+                .build();
     }
 }

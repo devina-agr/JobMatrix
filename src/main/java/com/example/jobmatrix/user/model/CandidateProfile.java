@@ -50,6 +50,9 @@ public class CandidateProfile{
     @Column(nullable = false)
     @NotBlank
     private String resumeUrl;
+    @NotBlank
+    @Column(nullable = false)
+    private String resumePublicId;
     @Column(length = 2000)
     private String bio;
     private String githubUrl;

@@ -1,5 +1,6 @@
 package com.example.jobmatrix.dto.request;
 
+import com.example.jobmatrix.company.model.Industry;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -12,9 +13,8 @@ public class CreateCompanyRequest {
 
     @NotBlank
     private String name;
-
-    @NotBlank
-    private String industry;
+    
+    private Industry industry;
 
     private String websiteUrl;
 

@@ -1,4 +1,5 @@
 package com.example.jobmatrix.dto.request;
+import com.example.jobmatrix.company.model.Industry;
 import lombok.*;
 
 @Getter
@@ -10,11 +11,9 @@ public class UpdateCompanyRequest {
 
     private String name;
 
-    private String industry;
+    private Industry industry;
 
     private String websiteUrl;
-
-    private String logoUrl;
 
     private String description;
 

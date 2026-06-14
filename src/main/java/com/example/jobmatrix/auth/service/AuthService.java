@@ -215,6 +215,9 @@ public class AuthService {
                 .websiteUrl(
                         request.getCompanyWebsite()
                 )
+                .industry(
+                        request.getIndustry()
+                )
                 .manager(
                         manager
                 )
