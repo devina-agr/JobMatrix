@@ -1,12 +1,13 @@
 package com.example.jobmatrix.upload;
 
+import lombok.Getter;
+
+@Getter
 public enum UploadFolder {
 
     RESUMES("jobmatrix/resumes"),
 
-    COMPANY_LOGOS("jobmatrix/company-logos"),
-
-    PROFILE_PICTURES("jobmatrix/profile-pictures");
+    COMPANY_LOGOS("jobmatrix/company-logos");
 
     private final String folder;
 
@@ -14,7 +15,4 @@ public enum UploadFolder {
         this.folder = folder;
     }
 
-    public String getFolder() {
-        return folder;
-    }
 }

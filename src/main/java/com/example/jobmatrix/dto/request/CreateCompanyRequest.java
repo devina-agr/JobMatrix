@@ -18,8 +18,6 @@ public class CreateCompanyRequest {
 
     private String websiteUrl;
 
-    private String logoUrl;
-
     private String description;
 
     private String headquarters;

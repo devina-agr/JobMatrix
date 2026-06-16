@@ -32,4 +32,6 @@ public class ExternalJobDto implements Serializable {
     private Double salary;
 
     private JobType jobType;
+
+    private Integer matchScore;
 }

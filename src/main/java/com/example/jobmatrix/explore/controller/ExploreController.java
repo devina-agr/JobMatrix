@@ -41,8 +41,20 @@ public class ExploreController {
                     Integer page,
 
             @RequestParam(defaultValue = "10")
-            Integer size
+            Integer size,
+
+            @RequestParam(required = false)
+                    String keyword
     ) {
+
+        if ((keyword == null || keyword.isBlank())
+                && (skills == null || skills.isEmpty())
+                && (location == null || location.isBlank())) {
+
+            throw new IllegalArgumentException(
+                    "Please provide keyword, skills, or location"
+            );
+        }
 
         JobSearchRequest request =
                 new JobSearchRequest();
@@ -54,6 +66,7 @@ public class ExploreController {
         request.setJobType(jobType);
         request.setPage(page);
         request.setSize(size);
+        request.setKeyword(keyword);
 
         return service.searchJobs(
                 request

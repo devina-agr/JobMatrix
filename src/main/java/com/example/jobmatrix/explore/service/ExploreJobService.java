@@ -38,39 +38,18 @@ public class ExploreJobService {
             );
         }
 
-        int page =
-                request.getPage();
-
-        int size =
-                request.getSize();
-
-        int start =
-                page * size;
-
-        int end =
-                Math.min(
-                        start + size,
-                        jobs.size()
-                );
-
-        List<ExternalJobDto> paginatedJobs =
-                start >= jobs.size()
-                        ? new ArrayList<>()
-                        : new ArrayList<>(
-                        jobs.subList(
-                                start,
-                                end
-                        )
-                );
-
         return JobSearchResponse.builder()
                 .totalJobs(
                         jobs.size()
                 )
-                .page(page)
-                .size(size)
+                .page(
+                        request.getPage()
+                )
+                .size(
+                        request.getSize()
+                )
                 .jobs(
-                        paginatedJobs
+                        jobs
                 )
                 .build();
     }

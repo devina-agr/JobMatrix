@@ -5,6 +5,7 @@ import com.example.jobmatrix.explore.dto.JobSearchRequest;
 import com.example.jobmatrix.explore.provider.JobProvider;
 import com.example.jobmatrix.job.model.JobType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExternalJobProvider implements JobProvider {
 
     private final RestClient restClient;
@@ -33,23 +35,30 @@ public class ExternalJobProvider implements JobProvider {
 
         return fetchJobsFromApi(request)
                 .stream()
-                .map(job -> Map.entry(
-                        job,
-                        calculateScore(
-                                job,
-                                request
-                        )
-                ))
-                .filter(
-                        entry -> entry.getValue() > 0
+                .map(job -> {
+
+                    int score =
+                            calculateScore(
+                                    job,
+                                    request
+                            );
+
+                    job.setMatchScore(
+                            score
+                    );
+
+                    return job;
+                })
+                .filter(job ->
+                        job.getMatchScore() > 0
                 )
                 .sorted(
-                        Map.Entry
-                                .<ExternalJobDto,Integer>
-                                        comparingByValue()
-                                .reversed()
+                        (a, b) ->
+                                Integer.compare(
+                                        b.getMatchScore(),
+                                        a.getMatchScore()
+                                )
                 )
-                .map(Map.Entry::getKey)
                 .toList();
     }
 
@@ -58,35 +67,44 @@ public class ExternalJobProvider implements JobProvider {
             JobSearchRequest request
     ) {
 
-        int score = 0;
+        int score = 10;
 
-        if (Boolean.TRUE.equals(
+        if(Boolean.TRUE.equals(
                 request.getRemoteOnly()
         )) {
 
-            if (job.getJobType()
-                    != JobType.REMOTE) {
+            if(job.getJobType()
+                    == JobType.REMOTE) {
+
+                score += 30;
+
+            } else {
 
                 return 0;
             }
-
-            score += 25;
         }
 
         if (request.getSkills() != null
-                && !request.getSkills().isEmpty()
-                && job.getSkills() != null
-                && !job.getSkills().isEmpty())  {
+                && !request.getSkills().isEmpty()) {
+
+            String searchableText =
+                    (
+                            (job.getTitle() == null
+                                    ? ""
+                                    : job.getTitle())
+                                    + " "
+                                    + (job.getDescription() == null
+                                    ? ""
+                                    : job.getDescription())
+                    ).toLowerCase();
 
             long skillMatches =
                     request.getSkills()
                             .stream()
                             .filter(skill ->
-                                    job.getSkills()
-                                            .stream()
-                                            .anyMatch(jobSkill ->
-                                                    jobSkill.equalsIgnoreCase(skill)
-                                            )
+                                    searchableText.contains(
+                                            skill.toLowerCase()
+                                    )
                             )
                             .count();
 
@@ -102,62 +120,32 @@ public class ExternalJobProvider implements JobProvider {
             }
         }
 
-        if (job.getJobType() == JobType.REMOTE) {
-
-            score += 10;
-
-        } else if (request.getLocation() != null
+        if(request.getLocation() != null
                 && !request.getLocation().isBlank()
-                && job.getLocation() != null
-                && !job.getLocation().isBlank()) {
+                && job.getLocation() != null) {
 
-            if (job.getLocation()
-                    .toLowerCase()
-                    .contains(
-                            request.getLocation()
-                                    .toLowerCase()
-                    )) {
+            String userLocation =
+                    request.getLocation()
+                            .toLowerCase();
+
+            String jobLocation =
+                    job.getLocation()
+                            .toLowerCase();
+
+            if(jobLocation.contains(
+                    userLocation
+            )) {
 
                 score += 20;
             }
         }
 
-//        if (request.getExperience() != null
-//                && job.getExperience() != null) {
-//
-//            int diff =
-//                    Math.abs(
-//                            request.getExperience()
-//                                    - job.getExperience()
-//                    );
-//
-//            if (diff == 0) {
-//
-//                score += 15;
-//
-//            } else if (diff <= 1) {
-//
-//                score += 10;
-//
-//            } else if (diff <= 2) {
-//
-//                score += 5;
-//            }
-//        }
-
-        if (request.getJobType() != null
+        if(request.getJobType() != null
                 && request.getJobType()
                 == job.getJobType()) {
 
-            score += 10;
+            score += 15;
         }
-
-//        if (request.getExpectedSalary() != null
-//                && job.getSalary() != null
-//                && job.getSalary() >= request.getExpectedSalary()) {
-//
-//            score += 10;
-//        }
 
         return score;
     }
@@ -169,31 +157,48 @@ public class ExternalJobProvider implements JobProvider {
 
         try {
 
-            String query =
-                    request.getSkills() == null
-                            || request.getSkills().isEmpty()
-                            ? "Software Developer"
-                            : String.join(
-                            " ",
-                            request.getSkills()
-                    );
+            StringBuilder query =
+                    new StringBuilder();
 
-            if (request.getLocation() != null
+            if(request.getKeyword() != null
+                    && !request.getKeyword().isBlank()) {
+
+                query.append(
+                        request.getKeyword()
+                );
+            }
+
+            if(request.getSkills() != null
+                    && !request.getSkills().isEmpty()) {
+
+                query.append(" ")
+                        .append(
+                                String.join(
+                                        " ",
+                                        request.getSkills()
+                                )
+                        );
+            }
+
+            if(request.getLocation() != null
                     && !request.getLocation().isBlank()) {
 
-                query += " " + request.getLocation();
+                query.append(" ")
+                        .append(
+                                request.getLocation()
+                        );
             }
 
             String encodedQuery =
                     URLEncoder.encode(
-                            query,
+                            query.toString(),
                             StandardCharsets.UTF_8
                     );
 
             String url =
                     "https://jsearch.p.rapidapi.com/search"
                             + "?query=" + encodedQuery
-                            + "&page=1"
+                            + "&page=" + (request.getPage() + 1)
                             + "&num_pages=1";
 
             Map<String, Object> response =
@@ -253,15 +258,13 @@ public class ExternalJobProvider implements JobProvider {
                                 )
                                 .description(description)
                                 .applyUrl(
-                                        (String) job.get(
-                                                "job_apply_link"
+                                        (String) job.getOrDefault(
+                                                "job_apply_link",
+                                                ""
                                         )
                                 )
                                 .skills(
-                                        extractSkills(
-                                                title,
-                                                description
-                                        )
+                                        List.of()
                                 )
                                 .salary(null)
                                 .experience(null)
@@ -274,7 +277,10 @@ public class ExternalJobProvider implements JobProvider {
 
         } catch (Exception e) {
 
-            e.printStackTrace();
+            log.error(
+                    "Failed to fetch jobs",
+                    e
+            );
 
             return List.of();
         }
@@ -320,61 +326,39 @@ public class ExternalJobProvider implements JobProvider {
     ) {
 
         String city =
-                (String) job.get("job_city");
+                (String) job.get(
+                        "job_city"
+                );
 
-        if (city != null
+        String state =
+                (String) job.get(
+                        "job_state"
+                );
+
+        String country =
+                (String) job.get(
+                        "job_country"
+                );
+
+        if(city != null
                 && !city.isBlank()) {
+
+            if(state != null
+                    && !state.isBlank()) {
+
+                return city + ", " + state;
+            }
 
             return city;
         }
 
-        String country =
-                (String) job.get("job_country");
-
-        if (country != null
+        if(country != null
                 && !country.isBlank()) {
 
             return country;
         }
 
         return "Remote";
-    }
-
-    private List<String> extractSkills(
-            String title,
-            String description
-    ) {
-
-        String text =
-                (title + " " + description)
-                        .toLowerCase();
-
-        List<String> knownSkills =
-                List.of(
-                        "java",
-                        "spring",
-                        "spring boot",
-                        "react",
-                        "angular",
-                        "node",
-                        "node.js",
-                        "mongodb",
-                        "mysql",
-                        "PostgreSQL",
-                        "redis",
-                        "docker",
-                        "kubernetes",
-                        "aws",
-                        "javascript",
-                        "typescript",
-                        "python",
-                        "django",
-                        "flask"
-                );
-
-        return knownSkills.stream()
-                .filter(text::contains)
-                .toList();
     }
 
     private JobType determineJobType(
