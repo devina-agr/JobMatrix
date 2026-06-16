@@ -1,5 +1,6 @@
 package com.example.jobmatrix.dto.request;
 
+import com.example.jobmatrix.user.model.Department;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -28,4 +29,6 @@ public class AcceptInvitationRequest {
             message = "Password must be at least 8 characters"
     )
     private String password;
+
+    private Department department;
 }

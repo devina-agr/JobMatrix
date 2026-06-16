@@ -203,6 +203,7 @@ public class RecruiterInvitationService {
                         .role(
                                 Role.ROLE_RECRUITER
                         )
+
                         .enabled(true)
                         .tokenVersion(0)
                         .build();
@@ -219,6 +220,7 @@ public class RecruiterInvitationService {
                         .company(
                                 invitation.getCompany()
                         )
+                        .department(request.getDepartment())
                         .verified(true)
                         .build();
 

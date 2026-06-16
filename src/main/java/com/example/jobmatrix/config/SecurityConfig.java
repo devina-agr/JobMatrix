@@ -61,6 +61,10 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
+                                "/api/invitations/accept"
+                        ).permitAll()
+
+                        .requestMatchers(
                                 "/api/admin/**"
                         ).hasRole("ADMIN")
 
@@ -77,6 +81,11 @@ public class SecurityConfig {
                         )
 
                         .hasRole("COMPANY_MANAGER")
+
+                        .requestMatchers(
+                                "/api/explore/**"
+                        ).permitAll()
+
                         .anyRequest()
                         .authenticated()
                 )

@@ -47,11 +47,9 @@ public class CandidateProfile{
     )
     @Column(name = "skill",nullable = false)
     private Set<String> skills;
-    @Column(nullable = false)
-    @NotBlank
+    
     private String resumeUrl;
-    @NotBlank
-    @Column(nullable = false)
+
     private String resumePublicId;
     @Column(length = 2000)
     private String bio;
