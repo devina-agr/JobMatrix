@@ -81,4 +81,18 @@ public class JobController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/public")
+    public ResponseEntity<Page<JobResponse>> getPublicJobs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ResponseEntity.ok(
+                jobService.getAllJobs(
+                        page,
+                        size
+                )
+        );
+    }
 }

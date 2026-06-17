@@ -63,7 +63,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/invitations/accept"
                         ).permitAll()
-
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/jobs/public"
+                        ).permitAll()
                         .requestMatchers(
                                 "/api/admin/**"
                         ).hasRole("ADMIN")

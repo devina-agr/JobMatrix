@@ -41,26 +41,39 @@ public class CloudinaryService {
 
         try {
 
+            String filename = file.getOriginalFilename();
+
+            if (filename == null) {
+                throw new RuntimeException("Invalid file");
+            }
+
+            String lowerFilename = filename.toLowerCase();
+
+            if (!(lowerFilename.endsWith(".pdf")
+                    || lowerFilename.endsWith(".doc")
+                    || lowerFilename.endsWith(".docx"))) {
+
+                throw new RuntimeException(
+                        "Only PDF, DOC and DOCX files are allowed"
+                );
+            }
+
             Map<?, ?> result =
                     cloudinary.uploader().upload(
                             file.getBytes(),
                             ObjectUtils.asMap(
-                                    "resource_type",
-                                    "raw",
-                                    "folder",
-                                    "jobmatrix/resumes"
+                                    "resource_type", "raw",
+                                    "folder", "jobmatrix/resumes",
+                                    "public_id",
+                                    java.util.UUID.randomUUID()
+                                            + "_"
+                                            + file.getOriginalFilename()
                             )
                     );
 
             return CloudinaryUploadResponse.builder()
-                    .url(
-                            result.get("secure_url")
-                                    .toString()
-                    )
-                    .publicId(
-                            result.get("public_id")
-                                    .toString()
-                    )
+                    .url(result.get("secure_url").toString())
+                    .publicId(result.get("public_id").toString())
                     .build();
 
         } catch (IOException e) {
