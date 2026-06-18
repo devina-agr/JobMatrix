@@ -28,13 +28,24 @@ public interface JobRepository
             Pageable pageable
     );
 
+    Page<Job> findByJobTypeAndActiveTrue(
+            JobType jobType,
+            Pageable pageable
+    );
+
     Page<Job> findByLocationContainingIgnoreCaseAndActiveTrue(
             String location,
             Pageable pageable
     );
 
-    Page<Job> findByJobTypeAndActiveTrue(
-            JobType jobType,
+    Page<Job> findByTitleContainingIgnoreCaseAndActiveTrue(
+            String keyword,
+            Pageable pageable
+    );
+
+    Page<Job> findByTitleContainingIgnoreCaseAndLocationContainingIgnoreCaseAndActiveTrue(
+            String keyword,
+            String location,
             Pageable pageable
     );
 

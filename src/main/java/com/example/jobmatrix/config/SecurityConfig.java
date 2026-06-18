@@ -65,7 +65,8 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.GET,
-                                "/api/jobs/public"
+                                "/api/jobs/public",
+                                "/api/jobs/search"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/admin/**"

@@ -95,4 +95,21 @@ public class JobController {
                 )
         );
     }
+    @GetMapping("/search")
+    public ResponseEntity<Page<JobResponse>> searchJobs(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String location,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ResponseEntity.ok(
+                jobService.searchJobs(
+                        keyword,
+                        location,
+                        page,
+                        size
+                )
+        );
+    }
 }

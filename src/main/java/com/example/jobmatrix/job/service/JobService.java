@@ -184,4 +184,54 @@ public class JobService {
 
         jobRepository.delete(job);
     }
+
+    public Page<JobResponse> searchJobs(
+            String keyword,
+            String location,
+            int page,
+            int size
+    ) {
+
+        Pageable pageable =
+                PageRequest.of(page, size);
+
+        Page<Job> jobs;
+
+        if(keyword != null && !keyword.isBlank()
+                && location != null && !location.isBlank()) {
+
+            jobs =
+                    jobRepository
+                            .findByTitleContainingIgnoreCaseAndLocationContainingIgnoreCaseAndActiveTrue(
+                                    keyword,
+                                    location,
+                                    pageable
+                            );
+
+        } else if(keyword != null && !keyword.isBlank()) {
+
+            jobs =
+                    jobRepository
+                            .findByTitleContainingIgnoreCaseAndActiveTrue(
+                                    keyword,
+                                    pageable
+                            );
+
+        } else if(location != null && !location.isBlank()) {
+
+            jobs =
+                    jobRepository
+                            .findByLocationContainingIgnoreCaseAndActiveTrue(
+                                    location,
+                                    pageable
+                            );
+
+        } else {
+
+            jobs =
+                    jobRepository.findAll(pageable);
+        }
+
+        return jobs.map(this::mapToResponse);
+    }
 }
