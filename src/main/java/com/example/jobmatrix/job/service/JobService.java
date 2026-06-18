@@ -232,6 +232,6 @@ public class JobService {
                     jobRepository.findAll(pageable);
         }
 
-        return jobs.map(this::mapToResponse);
+        return jobs.map(jobMapper::toResponse);
     }
 }
