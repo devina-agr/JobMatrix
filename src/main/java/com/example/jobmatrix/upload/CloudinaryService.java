@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -58,16 +61,17 @@ public class CloudinaryService {
                 );
             }
 
+            String publicId = UUID.randomUUID().toString();
+
             Map<?, ?> result =
                     cloudinary.uploader().upload(
                             file.getBytes(),
                             ObjectUtils.asMap(
                                     "resource_type", "raw",
                                     "folder", "jobmatrix/resumes",
-                                    "public_id",
-                                    java.util.UUID.randomUUID()
-                                            + "_"
-                                            + file.getOriginalFilename()
+                                    "public_id", publicId,
+                                    "use_filename", true,
+                                    "unique_filename", true
                             )
                     );
 
@@ -137,6 +141,22 @@ public class CloudinaryService {
 
             throw new RuntimeException(
                     "Failed to delete file",
+                    e
+            );
+        }
+    }
+
+    public byte[] downloadFile(String fileUrl) {
+
+        try (InputStream inputStream =
+                     new URL(fileUrl).openStream()) {
+
+            return inputStream.readAllBytes();
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Failed to download file",
                     e
             );
         }

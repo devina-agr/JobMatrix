@@ -236,4 +236,27 @@ public class CandidateProfileService {
             );
         }
     }
+
+    public byte[] downloadResumeBytes(Long userId) {
+
+        CandidateProfile profile =
+                candidateProfileRepository
+                        .findByUserId(userId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Profile not found"
+                                )
+                        );
+
+        if(profile.getResumeUrl() == null){
+
+            throw new ResourceNotFoundException(
+                    "Resume not uploaded"
+            );
+        }
+
+        return cloudinaryService.downloadFile(
+                profile.getResumeUrl()
+        );
+    }
 }
