@@ -82,7 +82,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/recruiter/profile/company/**"
-                        ).hasRole("COMPANY_MANAGER")
+                        ).authenticated()
 
                         .requestMatchers(
                                 "/api/candidate/**"

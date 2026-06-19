@@ -8,6 +8,7 @@ import com.example.jobmatrix.user.service.RecruiterProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,7 @@ public class RecruiterProfileController {
         );
     }
     @GetMapping("/company/{companyId}")
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<List<RecruiterProfileResponse>>
     getRecruitersByCompany(
             @PathVariable Long companyId
