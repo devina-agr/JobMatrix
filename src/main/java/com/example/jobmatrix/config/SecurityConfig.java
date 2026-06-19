@@ -77,12 +77,12 @@ public class SecurityConfig {
                         ).authenticated()
 
                         .requestMatchers(
-                                "/api/recruiter/**"
-                        ).hasRole("RECRUITER")
-
-                        .requestMatchers(
                                 "/api/recruiter/profile/company/**"
                         ).authenticated()
+
+                        .requestMatchers(
+                                "/api/recruiter/**"
+                        ).hasRole("RECRUITER")
 
                         .requestMatchers(
                                 "/api/candidate/**"
