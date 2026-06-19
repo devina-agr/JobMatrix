@@ -147,4 +147,24 @@ public class RecruiterProfileService {
                 profile
         );
     }
+    public List<RecruiterProfileResponse>
+    getRecruitersByCompany(
+            Long companyId
+    ) {
+
+        Company company =
+                companyRepository.findById(
+                        companyId
+                ).orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Company not found"
+                        )
+                );
+
+        return recruiterProfileRepository
+                .findByCompany(company)
+                .stream()
+                .map(recruiterProfileMapper::toResponse)
+                .toList();
+    }
 }

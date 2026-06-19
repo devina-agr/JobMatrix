@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/recruiter/profile")
 @RequiredArgsConstructor
@@ -59,6 +61,19 @@ public class RecruiterProfileController {
                         principal.getId(),
                         request
                 )
+        );
+    }
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<List<RecruiterProfileResponse>>
+    getRecruitersByCompany(
+            @PathVariable Long companyId
+    ) {
+
+        return ResponseEntity.ok(
+                recruiterProfileService
+                        .getRecruitersByCompany(
+                                companyId
+                        )
         );
     }
 }

@@ -1,9 +1,11 @@
 package com.example.jobmatrix.user.repository;
 
+import com.example.jobmatrix.company.model.Company;
 import com.example.jobmatrix.user.model.RecruiterProfile;
 import com.example.jobmatrix.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RecruiterProfileRepository
@@ -15,5 +17,9 @@ public interface RecruiterProfileRepository
 
     boolean existsByUser(
             User user
+    );
+
+    List<RecruiterProfile> findByCompany(
+            Company company
     );
 }

@@ -129,4 +129,5 @@ public class CompanyController {
                 "Company verified successfully"
         );
     }
+
 }
