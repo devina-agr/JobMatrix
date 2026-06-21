@@ -71,14 +71,20 @@ public class CompanyService {
         );
     }
 
-    public CompanyResponse getCompany(
-            Long companyId
+    public CompanyResponse getMyCompany(
+            Long managerId
     ) {
 
+        User manager =
+                userRepository.findById(managerId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Manager not found"
+                                )
+                        );
+
         Company company =
-                companyRepository.findById(
-                                companyId
-                        )
+                companyRepository.findByManager(manager)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Company not found"
@@ -109,65 +115,63 @@ public class CompanyService {
                 );
     }
 
-    public CompanyResponse updateCompany(
-            Long companyId,
+    public CompanyResponse updateMyCompany(
+            Long managerId,
             UpdateCompanyRequest request
     ) {
 
+        User manager =
+                userRepository.findById(managerId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Manager not found"
+                                )
+                        );
+
         Company company =
-                companyRepository.findById(
-                                companyId
-                        )
+                companyRepository.findByManager(manager)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Company not found"
                                 )
                         );
 
-        if(request.getName()!=null)
-            company.setName(
-                    request.getName()
-            );
+        if(request.getName() != null)
+            company.setName(request.getName());
 
-        if(request.getIndustry()!=null)
-            company.setIndustry(
-                    request.getIndustry()
-            );
+        if(request.getIndustry() != null)
+            company.setIndustry(request.getIndustry());
 
-        if(request.getWebsiteUrl()!=null)
-            company.setWebsiteUrl(
-                    request.getWebsiteUrl()
-            );
+        if(request.getWebsiteUrl() != null)
+            company.setWebsiteUrl(request.getWebsiteUrl());
 
-        if(request.getDescription()!=null)
-            company.setDescription(
-                    request.getDescription()
-            );
+        if(request.getDescription() != null)
+            company.setDescription(request.getDescription());
 
-        if(request.getHeadquarters()!=null)
-            company.setHeadquarters(
-                    request.getHeadquarters()
-            );
+        if(request.getHeadquarters() != null)
+            company.setHeadquarters(request.getHeadquarters());
 
-        if(request.getEmployeeCount()!=null)
-            company.setEmployeeCount(
-                    request.getEmployeeCount()
-            );
+        if(request.getEmployeeCount() != null)
+            company.setEmployeeCount(request.getEmployeeCount());
 
         companyRepository.save(company);
 
-        return companyMapper.toResponse(
-                company
-        );
+        return companyMapper.toResponse(company);
     }
-
-    public void deleteCompany(
-            Long companyId
+    public void deleteMyCompany(
+            Long managerId
     ) {
+        User manager =
+                userRepository.findById(managerId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Manager not found"
+                                )
+                        );
 
         Company company =
-                companyRepository.findById(
-                                companyId
+                companyRepository.findByManager(
+                                manager
                         )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
@@ -180,14 +184,22 @@ public class CompanyService {
         );
     }
 
-    public String uploadLogo(
-            Long companyId,
+    public String uploadMyCompanyLogo(
+            Long managerId,
             MultipartFile file
     ) {
 
+        User manager =
+                userRepository.findById(managerId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Manager not found"
+                                )
+                        );
+
         Company company =
-                companyRepository.findById(
-                                companyId
+                companyRepository.findByManager(
+                                manager
                         )
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(
@@ -222,13 +234,21 @@ public class CompanyService {
         return upload.getUrl();
     }
 
-    public void deleteLogo(
-            Long companyId
+    public void deleteMyCompanyLogo(
+            Long managerId
     ) {
 
+        User manager =
+                userRepository.findById(managerId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Manager not found"
+                                )
+                        );
+
         Company company =
-                companyRepository.findById(
-                                companyId
+                companyRepository.findByManager(
+                                manager
                         )
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(

@@ -46,7 +46,7 @@ public class CompanyController {
     ) {
 
         return ResponseEntity.ok(
-                companyService.getCompany(
+                companyService.getMyCompany(
                         principal.getId()
                 )
         );
@@ -75,7 +75,7 @@ public class CompanyController {
     ) {
 
         return ResponseEntity.ok(
-                companyService.updateCompany(
+                companyService.updateMyCompany(
                         userPrincipal.getId(),
                         request
                 )
@@ -87,7 +87,7 @@ public class CompanyController {
            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
-        companyService.deleteCompany(userPrincipal.getId());
+        companyService.deleteMyCompany(userPrincipal.getId());
 
         return ResponseEntity.noContent().build();
     }
@@ -102,7 +102,7 @@ public class CompanyController {
     ) {
 
         return ResponseEntity.ok(
-                companyService.uploadLogo(
+                companyService.uploadMyCompanyLogo(
                         userPrincipal.getId(),
                         file
                 )
@@ -114,7 +114,7 @@ public class CompanyController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
-        companyService.deleteLogo(
+        companyService.deleteMyCompanyLogo(
                 userPrincipal.getId()
         );
 
