@@ -39,15 +39,20 @@ public class CompanyController {
                 );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CompanyResponse> getCompany(
-            @PathVariable Long id
+    @GetMapping("/my-company")
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
+    public ResponseEntity<CompanyResponse> getMyCompany(
+            @AuthenticationPrincipal UserPrincipal principal
     ) {
 
         return ResponseEntity.ok(
-                companyService.getCompany(id)
+                companyService.getCompany(
+                        principal.getId()
+                )
         );
     }
+
+
 
     @GetMapping
     public ResponseEntity<Page<CompanyResponse>> getAllCompanies(
@@ -63,54 +68,54 @@ public class CompanyController {
         );
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/my-company")
     public ResponseEntity<CompanyResponse> updateCompany(
-            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody UpdateCompanyRequest request
     ) {
 
         return ResponseEntity.ok(
                 companyService.updateCompany(
-                        id,
+                        userPrincipal.getId(),
                         request
                 )
         );
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/my-company")
     public ResponseEntity<Void> deleteCompany(
-            @PathVariable Long id
+           @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
-        companyService.deleteCompany(id);
+        companyService.deleteCompany(userPrincipal.getId());
 
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(
-            value = "/{companyId}/logo",
+            value = "/my-company/logo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<String> uploadLogo(
-            @PathVariable Long companyId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam("file") MultipartFile file
     ) {
 
         return ResponseEntity.ok(
                 companyService.uploadLogo(
-                        companyId,
+                        userPrincipal.getId(),
                         file
                 )
         );
     }
 
-    @DeleteMapping("/{companyId}/logo")
+    @DeleteMapping("/my-company/logo")
     public ResponseEntity<Void> deleteLogo(
-            @PathVariable Long companyId
+            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
         companyService.deleteLogo(
-                companyId
+                userPrincipal.getId()
         );
 
         return ResponseEntity.noContent()
