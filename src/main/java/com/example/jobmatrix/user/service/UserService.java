@@ -85,7 +85,8 @@ public class UserService {
                                 )
                         );
 
-        userRepository.delete(user);
+        user.setEnabled(false);
+        userRepository.save(user);
     }
 
     private UserResponse mapToResponse(

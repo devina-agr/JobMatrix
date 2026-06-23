@@ -70,6 +70,10 @@ public class Company {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean blocked=false;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

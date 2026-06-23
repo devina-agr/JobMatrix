@@ -3,12 +3,16 @@ package com.example.jobmatrix.job.Controller;
 import com.example.jobmatrix.dto.request.CreateJobRequest;
 import com.example.jobmatrix.dto.request.UpdateJobRequest;
 import com.example.jobmatrix.dto.response.JobResponse;
+import com.example.jobmatrix.exception.BadRequestException;
+import com.example.jobmatrix.job.model.Job;
 import com.example.jobmatrix.job.service.JobService;
 import com.example.jobmatrix.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.support.CustomSQLErrorCodesTranslation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +24,9 @@ public class JobController {
     private final JobService jobService;
 
     @PostMapping
+    @PreAuthorize(
+            "hasAnyRole('COMPANY_MANAGER','RECRUITER')"
+    )
     public ResponseEntity<JobResponse> createJob(
             @RequestBody CreateJobRequest request,
             @AuthenticationPrincipal UserPrincipal principal
@@ -59,25 +66,34 @@ public class JobController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize(
+            "hasAnyRole('COMPANY_MANAGER','RECRUITER')"
+    )
     public ResponseEntity<JobResponse> updateJob(
             @PathVariable Long id,
-            @RequestBody UpdateJobRequest request
+            @RequestBody UpdateJobRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
         return ResponseEntity.ok(
                 jobService.updateJob(
                         id,
-                        request
+                        request,
+                        userPrincipal.getId()
                 )
         );
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/{id}/deactivate")
+    @PreAuthorize(
+            "hasAnyRole('COMPANY_MANAGER','RECRUITER')"
+    )
     public ResponseEntity<Void> deleteJob(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
-        jobService.deleteJob(id);
+        jobService.deactivateJob(id,userPrincipal.getId());
 
         return ResponseEntity.noContent().build();
     }

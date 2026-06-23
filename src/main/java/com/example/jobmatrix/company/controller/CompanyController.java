@@ -40,7 +40,9 @@ public class CompanyController {
     }
 
     @GetMapping("/my-company")
-    @PreAuthorize("hasRole('COMPANY_MANAGER')")
+    @PreAuthorize(
+            "hasAnyRole('COMPANY_MANAGER','RECRUITER')"
+    )
     public ResponseEntity<CompanyResponse> getMyCompany(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
@@ -82,12 +84,12 @@ public class CompanyController {
         );
     }
 
-    @DeleteMapping("/my-company")
-    public ResponseEntity<Void> deleteCompany(
+    @PutMapping("/my-company/block")
+    public ResponseEntity<Void> blockMyCompany(
            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
-        companyService.deleteMyCompany(userPrincipal.getId());
+        companyService.blockMyCompany(userPrincipal.getId());
 
         return ResponseEntity.noContent().build();
     }
@@ -135,4 +137,12 @@ public class CompanyController {
         );
     }
 
+    @PutMapping("/{companyId}/block")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> blockCompany(
+            @PathVariable Long companyId
+    ) {
+        companyService.blockCompany(companyId);
+        return ResponseEntity.noContent().build();
+    }
 }

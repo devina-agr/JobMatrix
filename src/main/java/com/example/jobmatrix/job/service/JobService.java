@@ -5,11 +5,16 @@ import com.example.jobmatrix.company.repository.CompanyRepository;
 import com.example.jobmatrix.dto.request.CreateJobRequest;
 import com.example.jobmatrix.dto.request.UpdateJobRequest;
 import com.example.jobmatrix.dto.response.JobResponse;
+import com.example.jobmatrix.exception.BadRequestException;
 import com.example.jobmatrix.exception.ResourceNotFoundException;
+import com.example.jobmatrix.exception.UnauthorizedException;
 import com.example.jobmatrix.job.model.Job;
 import com.example.jobmatrix.job.repository.JobRepository;
 import com.example.jobmatrix.mapper.JobMapper;
+import com.example.jobmatrix.user.model.RecruiterProfile;
+import com.example.jobmatrix.user.model.Role;
 import com.example.jobmatrix.user.model.User;
+import com.example.jobmatrix.user.repository.RecruiterProfileRepository;
 import com.example.jobmatrix.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -22,6 +27,7 @@ public class JobService {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final RecruiterProfileRepository recruiterProfileRepository;
     private final JobMapper jobMapper;
 
     public JobResponse createJob(
@@ -36,21 +42,47 @@ public class JobService {
                                         "Recruiter not found"
                                 )
                         );
+        if (!recruiter.isEnabled()) {
+            throw new UnauthorizedException(
+                    "Account is disabled"
+            );
+        }
+        Company company;
 
-        Company company =
-                companyRepository.findById(
-                                request.getCompanyId()
-                        )
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Company not found"
-                                )
-                        );
+        if (recruiter.getRole() == Role.ROLE_COMPANY_MANAGER) {
+
+            company =
+                    companyRepository.findByManager(recruiter)
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Company not found"
+                                    )
+                            );
+
+        } else {
+
+            RecruiterProfile profile =
+                    recruiterProfileRepository
+                            .findByUser(recruiter)
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Recruiter profile not found"
+                                    )
+                            );
+
+            company = profile.getCompany();
+        }
         if (!company.isVerified()) {
             throw new IllegalStateException(
                     "Company must be verified before posting jobs"
             );
         }
+        if (company.isBlocked()) {
+            throw new BadRequestException(
+                    "Company is blocked by admin"
+            );
+        }
+
         Job job = new Job();
 
         job.setRecruiter(recruiter);
@@ -92,7 +124,16 @@ public class JobService {
                                         "Job not found"
                                 )
                         );
-
+        if (!job.isActive()) {
+            throw new ResourceNotFoundException(
+                    "Job not found"
+            );
+        }
+        if (job.getCompany().isBlocked()) {
+            throw new ResourceNotFoundException(
+                    "Job is not active"
+            );
+        }
         return jobMapper.toResponse(job);
     }
 
@@ -110,14 +151,16 @@ public class JobService {
                 );
 
         return jobRepository
-                .findByActiveTrue(pageable)
+                .findByActiveTrueAndCompanyBlockedFalse(
+                        pageable
+                )
                 .map(jobMapper::toResponse);
     }
 
     public JobResponse updateJob(
             Long jobId,
-            UpdateJobRequest request
-    ) {
+            UpdateJobRequest request,
+            Long currentUserId) {
 
         Job job =
                 jobRepository.findById(jobId)
@@ -126,6 +169,58 @@ public class JobService {
                                         "Job not found"
                                 )
                         );
+        if (job.getCompany().isBlocked()) {
+            throw new BadRequestException(
+                    "Company is blocked"
+            );
+        }
+        if (!job.isActive()) {
+            throw new BadRequestException(
+                    "Cannot update an inactive job"
+            );
+        }
+        User currentUser =
+                userRepository.findById(currentUserId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "User not found"
+                                )
+                        );
+
+        Company company = job.getCompany();
+
+        boolean allowed = false;
+
+        if (currentUser.getRole() == Role.ROLE_COMPANY_MANAGER) {
+
+            allowed =
+                    company.getManager()
+                            .getId()
+                            .equals(currentUserId);
+
+        }
+        else if (currentUser.getRole() == Role.ROLE_RECRUITER) {
+
+            RecruiterProfile profile =
+                    recruiterProfileRepository
+                            .findByUser(currentUser)
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Recruiter profile not found"
+                                    )
+                            );
+
+            allowed =
+                    profile.getCompany()
+                            .getId()
+                            .equals(company.getId());
+        }
+
+        if (!allowed) {
+            throw new UnauthorizedException(
+                    "Access denied"
+            );
+        }
 
         if(request.getTitle()!=null)
             job.setTitle(request.getTitle());
@@ -155,9 +250,6 @@ public class JobService {
                     request.getEligibility()
             );
 
-        if(request.getActive() != null) {
-            job.setActive(request.getActive());
-        }
         if(request.getSkills() != null) {
             job.setSkills(request.getSkills());
         }
@@ -170,9 +262,9 @@ public class JobService {
         return jobMapper.toResponse(job);
     }
 
-    public void deleteJob(
-            Long jobId
-    ) {
+    public void deactivateJob(
+            Long jobId,
+            Long currentUserId) {
 
         Job job =
                 jobRepository.findById(jobId)
@@ -181,8 +273,55 @@ public class JobService {
                                         "Job not found"
                                 )
                         );
+        if (job.getCompany().isBlocked()) {
+            throw new BadRequestException(
+                    "Company is blocked"
+            );
+        }
+        User currentUser =
+                userRepository.findById(currentUserId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "User not found"
+                                )
+                        );
 
-        jobRepository.delete(job);
+        Company company = job.getCompany();
+
+        boolean allowed = false;
+
+        if (currentUser.getRole() == Role.ROLE_COMPANY_MANAGER) {
+
+            allowed =
+                    company.getManager()
+                            .getId()
+                            .equals(currentUserId);
+
+        }
+        else if (currentUser.getRole() == Role.ROLE_RECRUITER) {
+
+            RecruiterProfile profile =
+                    recruiterProfileRepository
+                            .findByUser(currentUser)
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Recruiter profile not found"
+                                    )
+                            );
+
+            allowed =
+                    profile.getCompany()
+                            .getId()
+                            .equals(company.getId());
+        }
+
+        if (!allowed) {
+            throw new UnauthorizedException(
+                    "Access denied"
+            );
+        }
+        job.setActive(false);
+        jobRepository.save(job);
     }
 
     public Page<JobResponse> searchJobs(
@@ -193,7 +332,11 @@ public class JobService {
     ) {
 
         Pageable pageable =
-                PageRequest.of(page, size);
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("createdAt").descending()
+                );
 
         Page<Job> jobs;
 
@@ -202,7 +345,7 @@ public class JobService {
 
             jobs =
                     jobRepository
-                            .findByTitleContainingIgnoreCaseAndLocationContainingIgnoreCaseAndActiveTrue(
+                            .findByTitleContainingIgnoreCaseAndLocationContainingIgnoreCaseAndActiveTrueAndCompanyBlockedFalse(
                                     keyword,
                                     location,
                                     pageable
@@ -212,7 +355,7 @@ public class JobService {
 
             jobs =
                     jobRepository
-                            .findByTitleContainingIgnoreCaseAndActiveTrue(
+                            .findByTitleContainingIgnoreCaseAndActiveTrueAndCompanyBlockedFalse(
                                     keyword,
                                     pageable
                             );
@@ -221,7 +364,7 @@ public class JobService {
 
             jobs =
                     jobRepository
-                            .findByLocationContainingIgnoreCaseAndActiveTrue(
+                            .findByLocationContainingIgnoreCaseAndActiveTrueAndCompanyBlockedFalse(
                                     location,
                                     pageable
                             );
@@ -229,7 +372,9 @@ public class JobService {
         } else {
 
             jobs =
-                    jobRepository.findAll(pageable);
+                    jobRepository.findByActiveTrueAndCompanyBlockedFalse(
+                            pageable
+                    );
         }
 
         return jobs.map(jobMapper::toResponse);

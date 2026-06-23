@@ -6,16 +6,24 @@ import com.example.jobmatrix.dto.request.CreateCompanyRequest;
 import com.example.jobmatrix.dto.request.UpdateCompanyRequest;
 import com.example.jobmatrix.dto.response.CloudinaryUploadResponse;
 import com.example.jobmatrix.dto.response.CompanyResponse;
+import com.example.jobmatrix.exception.BadRequestException;
 import com.example.jobmatrix.exception.ResourceNotFoundException;
+import com.example.jobmatrix.job.model.Job;
+import com.example.jobmatrix.job.repository.JobRepository;
 import com.example.jobmatrix.mapper.CompanyMapper;
 import com.example.jobmatrix.upload.CloudinaryService;
+import com.example.jobmatrix.user.model.RecruiterProfile;
 import com.example.jobmatrix.user.model.User;
+import com.example.jobmatrix.user.repository.RecruiterProfileRepository;
 import com.example.jobmatrix.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +36,10 @@ public class CompanyService {
     private final CompanyMapper companyMapper;
 
     private final CloudinaryService cloudinaryService;
+
+    private final JobRepository jobRepository;
+
+    private final RecruiterProfileRepository recruiterProfileRepository;
 
     public CompanyResponse createCompany(
             CreateCompanyRequest request,
@@ -90,7 +102,11 @@ public class CompanyService {
                                         "Company not found"
                                 )
                         );
-
+        if (company.isBlocked()) {
+            throw new BadRequestException(
+                    "Company is blocked"
+            );
+        }
         return companyMapper.toResponse(
                 company
         );
@@ -109,10 +125,8 @@ public class CompanyService {
                 );
 
         return companyRepository
-                .findAll(pageable)
-                .map(
-                        companyMapper::toResponse
-                );
+                .findByBlockedFalse(pageable)
+                .map(companyMapper::toResponse);
     }
 
     public CompanyResponse updateMyCompany(
@@ -136,6 +150,12 @@ public class CompanyService {
                                 )
                         );
 
+        if(company.isBlocked()) {
+
+            throw new BadRequestException(
+                    "Company has been blocked by admin"
+            );
+        }
         if(request.getName() != null)
             company.setName(request.getName());
 
@@ -158,7 +178,9 @@ public class CompanyService {
 
         return companyMapper.toResponse(company);
     }
-    public void deleteMyCompany(
+
+    @Transactional
+    public void blockMyCompany(
             Long managerId
     ) {
         User manager =
@@ -178,10 +200,44 @@ public class CompanyService {
                                         "Company not found"
                                 )
                         );
-
-        companyRepository.delete(
+        if (company.isBlocked()) {
+            throw new BadRequestException(
+                    "Company is already blocked"
+            );
+        }
+        company.setBlocked(true);
+        companyRepository.save(
                 company
         );
+
+        manager.setEnabled(false);
+
+        userRepository.save(manager);
+
+        List<Job> jobs =
+                jobRepository.findByCompany(company);
+
+        jobs.forEach(job ->
+                job.setActive(false)
+        );
+
+        jobRepository.saveAll(jobs);
+
+        List<RecruiterProfile> recruiters =
+                recruiterProfileRepository
+                        .findByCompany(company);
+
+        recruiters.forEach(profile -> {
+            User recruiter = profile.getUser();
+            recruiter.setEnabled(false);
+        });
+
+        userRepository.saveAll(
+                recruiters.stream()
+                        .map(RecruiterProfile::getUser)
+                        .toList()
+        );
+
     }
 
     public String uploadMyCompanyLogo(
@@ -206,7 +262,12 @@ public class CompanyService {
                                         "Company not found"
                                 )
                         );
+        if(company.isBlocked()) {
 
+            throw new BadRequestException(
+                    "Company has been blocked by admin"
+            );
+        }
         if(company.getLogoPublicId() != null){
 
             cloudinaryService.deleteFile(
@@ -234,6 +295,7 @@ public class CompanyService {
         return upload.getUrl();
     }
 
+    @Transactional
     public void deleteMyCompanyLogo(
             Long managerId
     ) {
@@ -255,7 +317,11 @@ public class CompanyService {
                                         "Company not found"
                                 )
                         );
-
+        if (company.isBlocked()) {
+            throw new BadRequestException(
+                    "Company is blocked"
+            );
+        }
         if(company.getLogoPublicId() != null){
 
             cloudinaryService.deleteFile(
@@ -283,5 +349,51 @@ public class CompanyService {
         company.setVerified(true);
 
         companyRepository.save(company);
+    }
+
+    public void blockCompany(Long companyId) {
+
+        Company company =
+                companyRepository.findById(companyId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Company not found"
+                                ));
+        if (company.isBlocked()) {
+            throw new BadRequestException(
+                    "Company is already blocked"
+            );
+        }
+        company.setBlocked(true);
+        companyRepository.save(company);
+        User manager = company.getManager();
+
+        manager.setEnabled(false);
+
+        userRepository.save(manager);
+
+        List<Job> jobs =
+                jobRepository.findByCompany(company);
+
+        jobs.forEach(job ->
+                job.setActive(false)
+        );
+
+        jobRepository.saveAll(jobs);
+
+        List<RecruiterProfile> recruiters =
+                recruiterProfileRepository
+                        .findByCompany(company);
+
+        recruiters.forEach(profile -> {
+            User recruiter = profile.getUser();
+            recruiter.setEnabled(false);
+        });
+
+        userRepository.saveAll(
+                recruiters.stream()
+                        .map(RecruiterProfile::getUser)
+                        .toList()
+        );
     }
 }

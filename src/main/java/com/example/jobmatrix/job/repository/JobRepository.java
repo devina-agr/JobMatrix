@@ -48,7 +48,27 @@ public interface JobRepository
             String location,
             Pageable pageable
     );
+    Page<Job> findByActiveTrueAndCompanyBlockedFalse(
+            Pageable pageable
+    );
 
+    Page<Job> findByTitleContainingIgnoreCaseAndActiveTrueAndCompanyBlockedFalse(
+            String keyword,
+            Pageable pageable
+    );
+
+    Page<Job> findByLocationContainingIgnoreCaseAndActiveTrueAndCompanyBlockedFalse(
+            String location,
+            Pageable pageable
+    );
+
+    Page<Job> findByTitleContainingIgnoreCaseAndLocationContainingIgnoreCaseAndActiveTrueAndCompanyBlockedFalse(
+            String keyword,
+            String location,
+            Pageable pageable
+    );
+
+    List<Job> findByCompany(Company company);
 
     @EntityGraph(attributePaths = {
             "company",

@@ -14,6 +14,7 @@ public class UserMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .enabled(user.isEnabled())
                 .build();
     }
 }

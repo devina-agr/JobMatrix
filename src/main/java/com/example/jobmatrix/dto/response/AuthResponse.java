@@ -17,4 +17,6 @@ public class AuthResponse {
 
     private String role;
 
+    private boolean enabled;
+
 }
