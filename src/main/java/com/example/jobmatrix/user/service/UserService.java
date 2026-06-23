@@ -1,7 +1,9 @@
 package com.example.jobmatrix.user.service;
 
 import com.example.jobmatrix.dto.response.UserResponse;
+import com.example.jobmatrix.exception.BadRequestException;
 import com.example.jobmatrix.exception.ResourceNotFoundException;
+import com.example.jobmatrix.user.model.Role;
 import com.example.jobmatrix.user.model.User;
 import com.example.jobmatrix.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +52,9 @@ public class UserService {
                                         "User not found"
                                 )
                         );
-
+        if(user.isEnabled()){
+            return;
+        }
         user.setEnabled(true);
 
         userRepository.save(user);
@@ -67,13 +71,22 @@ public class UserService {
                                         "User not found"
                                 )
                         );
-
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            throw new BadRequestException(
+                    "Admin accounts cannot be disabled"
+            );
+        }
+        if(!user.isEnabled()){
+            return;
+        }
         user.setEnabled(false);
-
+        user.setTokenVersion(
+                user.getTokenVersion() + 1
+        );
         userRepository.save(user);
     }
 
-    public void deleteUser(
+    public void deactivateUser(
             Long userId
     ) {
 
@@ -85,8 +98,27 @@ public class UserService {
                                 )
                         );
 
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            throw new BadRequestException(
+                    "Admin accounts cannot be disabled"
+            );
+        }
+
         user.setEnabled(false);
+        user.setTokenVersion(
+                user.getTokenVersion() + 1
+        );
         userRepository.save(user);
+    }
+
+    public List<UserResponse> getUsersByRole(
+            Role role
+    ) {
+        return userRepository
+                .findByRoleOrderByCreatedAtDesc(role)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     private UserResponse mapToResponse(

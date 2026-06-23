@@ -2,6 +2,7 @@ package com.example.jobmatrix.user.controller;
 
 import com.example.jobmatrix.dto.response.UserResponse;
 import com.example.jobmatrix.security.UserPrincipal;
+import com.example.jobmatrix.user.model.Role;
 import com.example.jobmatrix.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -88,16 +89,27 @@ public class UserController {
 
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{userId}")
+    @PatchMapping("/{userId}/deactivate")
     public ResponseEntity<Void> deleteUser(
             @PathVariable Long userId
     ) {
 
-        userService.deleteUser(
+        userService.deactivateUser(
                 userId
         );
 
         return ResponseEntity.noContent()
                 .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<UserResponse>> getUsersByRole(
+            @PathVariable Role role
+    ) {
+
+        return ResponseEntity.ok(
+                userService.getUsersByRole(role)
+        );
     }
 }
