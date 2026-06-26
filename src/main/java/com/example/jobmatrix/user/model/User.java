@@ -48,7 +48,4 @@ public class User {
         this.createdAt=LocalDateTime.now();
     }
 
-    public Boolean isEnabled() {
-        return false;
-    }
 }

@@ -55,7 +55,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/job/{jobId}")
-    @PreAuthorize("hasRole('RECRUITER')")
+    @PreAuthorize("hasAnyRole('RECRUITER', 'COMPANY_MANAGER')")
     public ResponseEntity<List<ApplicationResponse>>
     getJobApplications(
             @PathVariable Long jobId
@@ -69,7 +69,7 @@ public class ApplicationController {
     }
 
     @PatchMapping("/{applicationId}/status")
-    @PreAuthorize("hasRole('RECRUITER')")
+    @PreAuthorize("hasAnyRole('RECRUITER', 'COMPANY_MANAGER')")
     public ResponseEntity<ApplicationResponse>
     updateStatus(
             @PathVariable Long applicationId,
@@ -85,6 +85,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/{applicationId}")
+    @PreAuthorize("hasAnyRole('RECRUITER','COMPANY_MANAGER')")
     public ResponseEntity<ApplicationResponse>
     getApplication(
             @PathVariable Long applicationId
