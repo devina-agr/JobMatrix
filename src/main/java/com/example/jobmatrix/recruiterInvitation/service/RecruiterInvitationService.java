@@ -113,7 +113,7 @@ public class RecruiterInvitationService {
         );
 
         String inviteLink =
-                "http://localhost:5173/accept-invite?token="
+                "https://job-matrix-frontend.vercel.app/accept-invite?token="
                         + token;
 
         emailService.sendRecruiterInvitation(

@@ -14,7 +14,7 @@ public class WebConfig
 
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "http://localhost:5173"
+                        "https://job-matrix-frontend.vercel.app/"
                 )
                 .allowedMethods("*")
                 .allowedHeaders("*")
