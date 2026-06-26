@@ -118,6 +118,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(
                 List.of(
+                        "https://job-matrix-frontend.vercel.app",
                         "http://localhost:5173",
                         "http://localhost:3000"
                 )
